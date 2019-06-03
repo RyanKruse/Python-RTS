@@ -8,15 +8,15 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
-# Game Settings
+# Main Settings
 SCREEN_WIDTH = 1700
 SCREEN_HEIGHT = 900
 FPS = 100
-TITLE = "Sassilization"
+GAME_TITLE = "Python RTS"
 BGCOLOR = DARKGREY
 WAIT_TIME = 2
-PLAYER_SPEED = 20  # 4
-PLAYER_SPEED_FAST = 60  # 8
+CAMERA_SPEED_DEFAULT = 20  # 4
+CAMERA_SPEED_FAST = 60  # 8
 WINNING_CONDITION = 1000
 NO_SURFACE = (0, 0)
 NO_RECT = (0, 0, 0, 0)
@@ -139,9 +139,9 @@ TOWER_ARROW_EXTRA_OVERLAP = 2
 # Knight
 KNIGHT_VALID = 'images/knight_deselected.bmp'  # forgot
 KNIGHT_INVALID = 'images/knight_invalid.bmp'
-KNIGHT_F = -9
-KNIGHT_I = -6
-KNIGHT_G = -0
+KNIGHT_F = 9
+KNIGHT_I = 6
+KNIGHT_G = 0
 KNIGHT_SUPPLY = 1
 KNIGHT_HP = 10
 
@@ -150,10 +150,10 @@ KNIGHT_HP = 10
 # =============================================== Resource Settings ================================================== #
 
 # Starting Storage
-FOOD_STORAGE = 999  # 120
-IRON_STORAGE = 999  # 75
-GOLD_STORAGE = 999  # 70
-CREED_STORAGE = 0
+FOOD_START = 300  # 120
+IRON_START = 300  # 75
+GOLD_START = 900  # 70
+CREED_START = 0
 
 # Starting Income (should only be after city is built or below minimum city requirements)
 FOOD_INCOME = 8

@@ -1,17 +1,16 @@
 # Scroll-map Imports
 import sys
 import pygame as pg
-import window as w
+import window
+import game
 from os import path
 from pygame.sprite import Group
 from settings import *
 from sprites import Player, Wall
 
 # My Imports
-from stats import Stats
 from mouse import Mouse
 from unit import *
-from button import *
 from ghost import *
 from panel import *
 from enemy import *
@@ -20,60 +19,28 @@ from construction import *
 from runner import Runner
 from pygame.math import Vector2
 
+# Due to frequency of use, Main = m, Group = g, Pygame = pg.
 
-class Game:
+
+class Main:
     def __init__(self):
-        """Initialize variables from settings."""
-        # Initialize pygame variables.
-        pg.init()  # Sets up Pygame.
-        pg.display.set_caption(TITLE)  # Title of program.
+        # Initialize game.
+        pg.init()
+        pg.display.set_caption(GAME_TITLE)  # Program title
+        self.g = game.Groups()
+        self.resource = game.Resource(self)
 
-        # Initialize screen variables.
-        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # Creates pygame window.
-        self.map = w.Map(path.join(path.dirname(__file__), MAPNAME))  # Imports map text file.
-        self.camera = w.Camera(self.map.width, self.map.height)  # Constructs camera.
-        self.player_speed = PLAYER_SPEED
-
-        # Initialize time
-        self.clock = pg.time.Clock()
-        self.dt = None
-        self.irl_seconds_played = 0
-        self.r_tick = 0
-
-        # Draw/Collision Groups
-        self.all_sprites = pg.sprite.Group()
-        self.collision_sprites = pg.sprite.Group()
-        self.mouse_group = pg.sprite.Group()
-        # Unit Groups
-        self.units = pg.sprite.Group()
-        self.selected_units = pg.sprite.Group()
-        self.enemy_units = pg.sprite.Group()
-        self.projectiles = pg.sprite.Group()
-        # Ghost Groups
-        self.ghost_building = pg.sprite.Group()
-        self.ghost_plate = pg.sprite.Group()
-        self.current_run = pg.sprite.Group()
-        # GUI Groups
-        self.all_buttons = pg.sprite.Group()
-        self.panels = []
-        # Map Groups
-        self.map_walls = pg.sprite.Group()
-        self.map_iron = pg.sprite.Group()
-        self.map_food = pg.sprite.Group()
-        # Building Groups
-        self.buildings = pg.sprite.Group()
-        self.construction = pg.sprite.Group()
-        self.cities = pg.sprite.Group()
-        self.walls = pg.sprite.Group()
-        self.plates = pg.sprite.Group()
-        self.towers = pg.sprite.Group()
+        # Initialize window.
+        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.map = window.Map()
+        self.camera = window.Camera(self)
+        self.clock = window.Clock()
+        self.city_button = window.CityButton(self)
+        self.wall_button = window.WallButton(self)
+        self.tower_button = window.TowerButton(self)
+        self.knight_button = window.KnightButton(self)
 
         # Initialize menu buttons & logic
-        self.stats = Stats(self)
-        self.city_button = CityButton(self)
-        self.wall_button = WallButton(self)
-        self.tower_button = TowerButton(self)
-        self.knight_button = KnightButton(self)
         self.food_panel = FoodPanel(self)
         self.iron_panel = IronPanel(self)
         self.gold_panel = GoldPanel(self)
@@ -93,9 +60,12 @@ class Game:
         self.hotkey = HotKey(self)
         self.runner = Runner(self)
 
+    def alive(self):
+        return len(self.g.cities) > 0
+
     def new(self):
         """Initialize the map string for a new game. Creates walls and player (which camera follows)."""
-        for row, tiles in enumerate(self.map.data):
+        for row, tiles in enumerate(self.map.contents):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row)
@@ -131,12 +101,12 @@ class Game:
         # C
         if event.key == pg.K_c:
             EnemyKnight(self)
-            self.stats.refresh_income()
+            self.resource.refresh()
         # R & CTRL+R
         elif event.key == pg.K_r:
             if self.is_ctrl_pressed and self.is_ghost_building:
                 self.destroy_ghost()
-            elif self.selected_units:
+            elif self.g.selected_units:
                 self.deselect_units()
             elif self.is_ctrl_pressed:
                 self.refund_building()
@@ -144,14 +114,15 @@ class Game:
         elif event.key == pg.K_LSHIFT:
             self.is_shift_pressed = True
             self.delete_ghost_plates()
-            self.player_speed = PLAYER_SPEED_FAST
+            self.camera.speed = CAMERA_SPEED_FAST
         # CTRL
         elif event.key == pg.K_LCTRL:
             self.hide_ghost(True)
         # ALT
         elif event.key == pg.K_LALT:
-            self.is_alt_pressed = True
-            self.random_number = random.randint(1, self.pass_length)
+            pass  # Currently crashes game.
+            # self.is_alt_pressed = True
+            # self.random_number = random.randint(1, self.pass_length)
         # Quit
         elif event.key == pg.K_ESCAPE:
             self.exit_game()
@@ -166,7 +137,7 @@ class Game:
         # SHIFT
         if event.key == pg.K_LSHIFT:
             self.is_shift_pressed = False
-            self.player_speed = PLAYER_SPEED
+            self.camera.speed = CAMERA_SPEED_DEFAULT
         # CTRL
         elif event.key == pg.K_LCTRL:
             self.hide_ghost(False)
@@ -199,7 +170,7 @@ class Game:
 
     def mouse_move(self, event):
         pass
-    # ================================================ Game Functions =============================================== #
+    # ================================================ Main Functions =============================================== #
 
     def exit_game(self):
         """Quits game."""
@@ -208,14 +179,14 @@ class Game:
 
     def deselect_units(self):
         """Deselects all units."""
-        for unit in self.selected_units:
+        for unit in self.g.selected_units:
             unit.set_deselected()
 
     def destroy_ghost(self):
         """Destroys ghost and deselects all buttons."""
-        for ghost in self.ghost_building:
+        for ghost in self.g.ghost_building:
             ghost.delete()
-        for button in self.all_buttons:
+        for button in self.g.all_buttons:
             button.deselect()
         self.is_ghost_building = False
         self.delete_ghost_plates()
@@ -224,12 +195,12 @@ class Game:
         """Adds or hides ghost from view."""
         self.is_ctrl_pressed = is_ctrl_pressed
         if self.is_ctrl_pressed:
-            for ghost in self.ghost_building:
-                self.all_sprites.add(ghost)
+            for ghost in self.g.ghost_building:
+                self.g.all_sprites.add(ghost)
                 self.is_ghost_building = True
         else:
-            for ghost in self.ghost_building:
-                self.all_sprites.remove(ghost)
+            for ghost in self.g.ghost_building:
+                self.g.all_sprites.remove(ghost)
                 self.is_ghost_building = False
                 self.delete_ghost_plates()
 
@@ -238,47 +209,48 @@ class Game:
         if self.is_ctrl_pressed and self.is_ghost_building:
             gate = True
             # Allows construction only if not clicking on button or panel.
-            for button in self.all_buttons:
+            for button in self.g.all_buttons:
                 if button.get_clicked():
                     gate = False
-            for panel in self.panels:
+            for panel in self.g.panels:
                 if panel.get_clicked():
                     gate = False
             if gate:
-                for ghost in self.ghost_building:
+                for ghost in self.g.ghost_building:
                     ghost.construct_building()
 
     def construct_ghost(self):
         """Creates building ghost when button is clicked."""
         if self.is_ctrl_pressed:
-            for button in self.all_buttons:
+            for button in self.g.all_buttons:
                 button.is_clicked()
 
     def command_units(self):
         """Defines move_x and move_y for selected units."""
         self.mouse.is_commanding = True
-        for unit in self.selected_units:
+        for unit in self.g.selected_units:
             unit.set_move_location()
 
     def check_button_validity(self):
         """Makes sure certain buttons appear if a city exist."""
-        for button in self.all_buttons:
+        for button in self.g.all_buttons:
             button.get_restricted()
 
     def refund_building(self):
         """Refund building mouse hovering over."""
-        mouse_collided = pg.sprite.spritecollide(self.mouse, self.buildings, False)
+        mouse_collided = pg.sprite.spritecollide(self.mouse, self.g.buildings, False)
         if mouse_collided:
-            self.stats.subtract_resources(mouse_collided[0].refund_amount)
+            refund_amount = mouse_collided[0].refund_amount
             mouse_collided[0].delete()
-            self.stats.refresh_income()
+            self.resource.deduct(refund_amount)
+            mouse_collided[0].delete()
         self.check_button_validity()
-        self.stats.refresh_income()
+        self.resource.refresh()
 
     def delete_ghost_plates(self):
         """Delete all ghost plates."""
-        for plate in self.ghost_plate:
-            pg.sprite.spritecollide(plate, self.ghost_plate, True)
+        for plate in self.g.ghost_plate:
+            pg.sprite.spritecollide(plate, self.g.ghost_plate, True)
 
     def circol(self, left, right):
         """Detects circle collision."""
@@ -364,17 +336,15 @@ class Game:
     def update(self):
         """Updates clock, all sprites, camera, and resources."""
         self.update_clock()
-        self.all_sprites.update()
+        self.g.all_sprites.update()
         self.camera.update(self.player)
-        self.stats.update_resources()
+        self.resource.income()
 
     def update_clock(self):
         """Updates all the time variables in the game."""
-        self.dt = self.clock.tick(FPS) / 1000
-        self.irl_seconds_played += self.dt
-        # The resource clock only ticks if a city exist.
-        if len(self.cities) != 0:
-            self.r_tick += RESOURCE_TICK
+        self.clock.delta_time = self.clock.clock.tick(FPS) / 1000
+        self.clock.irl_time += self.clock.delta_time
+        self.clock.resource_time += RESOURCE_TICK
 
     # ==================================================== Draw ==================================================== #
 
@@ -385,7 +355,7 @@ class Game:
         self.draw_grid()
         self.draw_circles()
         self.draw_ghost_plates()
-        for sprite in self.all_sprites:
+        for sprite in self.g.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         self.draw_resources()
         self.draw_gui()
@@ -400,10 +370,10 @@ class Game:
 
     def draw_gui(self):
         """This draws the GUI."""
-        for panel in self.panels:
+        for panel in self.g.panels:
             panel.draw_panel()
         if self.is_ctrl_pressed:
-            for button in self.all_buttons:
+            for button in self.g.all_buttons:
                 if not button.is_restricted:
                     self.screen.blit(button.image, button.rect)
 
@@ -411,33 +381,33 @@ class Game:
         """Draws circular territory and borders."""
         if self.is_debugging:
             if self.is_ctrl_pressed:
-                for ghost in self.ghost_building:
+                for ghost in self.g.ghost_building:
                     ghost.draw_circle()
-            for construction in self.construction:
+            for construction in self.g.construction:
                 construction.draw_circle()
-            for city in self.cities:
-                mouse_collide = pg.sprite.spritecollide(city, self.mouse_group, False, collided=self.circol)
+            for city in self.g.cities:
+                mouse_collide = pg.sprite.spritecollide(city, self.g.mouse_group, False, collided=self.circol)
                 if mouse_collide:
                     city.draw_territory()
-        for city in self.cities:
+        for city in self.g.cities:
             city.draw_circle()
 
     def draw_resources(self):
         """Draws the map food and iron."""
-        for iron in self.map_iron:
+        for iron in self.g.map_iron:
             iron.draw()
-        for food in self.map_food:
+        for food in self.g.map_food:
             food.draw()
 
     def draw_ghost_plates(self):
         """Draws our wall plates."""
-        for plate in self.ghost_plate:
+        for plate in self.g.ghost_plate:
             self.screen.blit(plate.image, self.camera.apply(plate))
-        for plate in self.plates:
+        for plate in self.g.plates:
             self.screen.blit(plate.image, self.camera.apply(plate))
 
 
 # Creates and runs game class.
-game = Game()
+game = Main()
 game.new()
 game.run()

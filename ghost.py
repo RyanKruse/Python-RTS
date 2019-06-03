@@ -42,7 +42,7 @@ class Ghost(Sprite):
 
     def child_init(self, building_valid, building_invalid):
         """Child class initializations."""
-        self.game.all_sprites.add(self)
+        self.game.g.all_sprites.add(self)
         self.image_valid = pg.image.load(building_valid)
         self.image_invalid = pg.image.load(building_invalid)
         self.image = self.image_valid
@@ -58,7 +58,7 @@ class Ghost(Sprite):
 
     def delete(self):
         """Deletes self."""
-        pg.sprite.spritecollide(self, self.game.ghost_building, True)
+        pg.sprite.spritecollide(self, self.game.g.ghost_building, True)
 
     def collision_detection(self, any_colliding, city_territory=None, wall_colliding=None):
         """Checks ghost to see if it is valid. If obstacle detected, it's invalid."""
@@ -71,7 +71,7 @@ class Ghost(Sprite):
             self.is_valid = True
 
     def construction_calculations(self, building, *proxy_cost):
-        self.game.stats.subtract_resources(self.cost)
+        self.game.resource.deduct(self.cost)
 
     def check_valid(self):
         """This is too complicated for the parent class since each child has unique collision requirements."""
@@ -98,13 +98,13 @@ class CityGhost(Ghost):
         self.cost = [CITY_F, CITY_I, CITY_G]
 
     def construct_building(self):
-        if self.is_valid and self.game.stats.is_enough_resources(self.cost):
+        if self.is_valid and self.game.resource.is_valid(self.cost):
             self.construction_calculations(Construction(self.game, self.rect.x + (self.size[0] / 2) + self.game.camera.x,
                                                         self.rect.y + (self.size[1] / 2) + self.game.camera.y))
 
     def check_valid(self):
         """Cannot overlap with anything in order for it to build."""
-        self.collision_detection(pg.sprite.spritecollide(self, self.game.collision_sprites, False), 1)
+        self.collision_detection(pg.sprite.spritecollide(self, self.game.g.collision_sprites, False), 1)
 
 
 class WallGhost(Ghost):
@@ -119,30 +119,30 @@ class WallGhost(Ghost):
     def construct_building(self):
         """Needs to also factor in plate cost. Ignore for now."""
         self.cost = [WALL_F, WALL_I, WALL_G]
-        if self.game.ghost_plate:
-            for plate in self.game.ghost_plate:
+        if self.game.g.ghost_plate:
+            for plate in self.game.g.ghost_plate:
                 self.cost[0] += WALL_F
                 self.cost[1] += WALL_I
                 self.cost[2] += WALL_G
-            if self.is_valid and self.game.stats.is_enough_resources(self.cost):
+            if self.is_valid and self.game.resource.is_valid(self.cost):
                 self.construction_calculations2(WallBuilding(self.game))
-                for plate in self.game.ghost_plate:
+                for plate in self.game.g.ghost_plate:
                     plate.spawn_plate()
         else:
-            if self.is_valid and self.game.stats.is_enough_resources(self.cost):
+            if self.is_valid and self.game.resource.is_valid(self.cost):
                 self.construction_calculations2(WallBuilding(self.game))
 
     def construction_calculations2(self, building, *proxy_cost):
-        self.game.stats.subtract_resources(self.cost)
+        self.game.resource.deduct(self.cost)
 
     def check_valid(self):
         """Can overlap the map, other buildings, and itself. Has minimum distance necessary from other walls"""
         # Something about collision with city territory circle. If mouse cursor over city territory, print something
 
         self.radius = WALL_CIRCLE_RESTRICT
-        self.collision_detection(pg.sprite.spritecollide(self.game.mouse, self.game.collision_sprites, False),
-                                 pg.sprite.spritecollide(self.game.mouse, self.game.cities, False, collided=self.game.circol),
-                                 pg.sprite.spritecollide(self, self.game.walls, False, collided=self.game.circol))
+        self.collision_detection(pg.sprite.spritecollide(self.game.mouse, self.game.g.collision_sprites, False),
+                                 pg.sprite.spritecollide(self.game.mouse, self.game.g.cities, False, collided=self.game.circol),
+                                 pg.sprite.spritecollide(self, self.game.g.walls, False, collided=self.game.circol))
 
     def draw_circle(self):
         """Creates circle around ghost wall sprite. Active during debugging."""
@@ -168,7 +168,7 @@ class WallGhost(Ghost):
         while self.radius < WALL_MAX_BOOM:
             if not self.collided_circle:
                 self.radius += WALL_ITERATION_BOOM
-                self.collided_circle = pg.sprite.spritecollide(self, self.game.walls, False, collided=self.game.circol)
+                self.collided_circle = pg.sprite.spritecollide(self, self.game.g.walls, False, collided=self.game.circol)
             else:
                 break
 
@@ -186,8 +186,8 @@ class PlateGhost(Ghost):
     def __init__(self, game, runner):
         super().__init__(game)
         self.runner = runner
-        self.game.ghost_plate.add(self)
-        self.game.current_run.add(self)
+        self.game.g.ghost_plate.add(self)
+        self.game.g.current_run.add(self)
         self.cost = [WALL_F, WALL_I, WALL_G]
         self.colorkey = None
         # Rotation
@@ -202,7 +202,7 @@ class PlateGhost(Ghost):
     def child_init(self, *blank):
         """We calculate rotation, rotate the image, redefine rect, hide black filler, and make transparent."""
         # Check to see if wall is valid first, if that's not valid then plates are not valid.
-        for wall in self.game.ghost_building:
+        for wall in self.game.g.ghost_building:
             self.is_valid = wall.is_valid
 
         # I split rotating the image it into two statements for better image accuracy placement.
@@ -238,17 +238,17 @@ class TowerGhost(Ghost):
         self.image.set_colorkey(self.colorkey)
 
     def construct_building(self):
-        if self.is_valid and self.game.stats.is_enough_resources(self.cost):
+        if self.is_valid and self.game.resource.is_valid(self.cost):
             self.construction_calculations(TowerBuilding(self.game))
 
     def check_valid(self):
         """Should be strict. Can overlap the map, other buildings, but not itself."""
         # wtf is this
-        collision1 = pg.sprite.spritecollide(self, self.game.towers, False)
-        collision1 += pg.sprite.spritecollide(self.game.mouse, self.game.collision_sprites, False)
-        collision1 += pg.sprite.spritecollide(self, self.game.map_walls, False)
+        collision1 = pg.sprite.spritecollide(self, self.game.g.towers, False)
+        collision1 += pg.sprite.spritecollide(self.game.mouse, self.game.g.collision_sprites, False)
+        collision1 += pg.sprite.spritecollide(self, self.game.g.map_walls, False)
         self.collision_detection(collision1,
-                                 pg.sprite.spritecollide(self.game.mouse, self.game.cities, False, collided=self.game.circol))
+                                 pg.sprite.spritecollide(self.game.mouse, self.game.g.cities, False, collided=self.game.circol))
 
     def hide_color_key(self):
         self.colorkey = self.image.get_at((0, 0))
@@ -263,10 +263,10 @@ class KnightGhost(Ghost):
         self.rect = pg.Rect(1, 1, 1, 1)
 
     def construct_building(self):
-        if self.is_valid and self.game.stats.is_enough_resources(self.cost):
+        if self.is_valid and self.game.resource.is_valid(self.cost):
             self.construction_calculations(Knight(self.game))
 
     def check_valid(self):
         """Should be not strict. Can overlap the map, other buildings, and itself."""
-        self.collision_detection(pg.sprite.spritecollide(self.game.mouse, self.game.collision_sprites, False),
-                                 pg.sprite.spritecollide(self.game.mouse, self.game.cities, False, collided=self.game.circol))
+        self.collision_detection(pg.sprite.spritecollide(self.game.mouse, self.game.g.collision_sprites, False),
+                                 pg.sprite.spritecollide(self.game.mouse, self.game.g.cities, False, collided=self.game.circol))

@@ -12,7 +12,7 @@ class Construction(Sprite):
     """Construction delay for building cities or workshops."""
     def __init__(self, game, x, y):
         # Group information
-        self.groups = game.all_sprites, game.collision_sprites, game.construction
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.construction
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.cost = []
@@ -24,7 +24,7 @@ class Construction(Sprite):
         self.image = pg.image.load(CITY_VALID)
         self.size = self.image.get_rect().size
         self.rect = self.image.get_rect()
-        for ghost in self.game.ghost_building:
+        for ghost in self.game.g.ghost_building:
             self.rect.x = ghost.rect.x
             self.rect.y = ghost.rect.y
 
@@ -51,7 +51,7 @@ class Construction(Sprite):
 
     def delete(self):
         """Deletes self after construction is complete."""
-        pg.sprite.spritecollide(self, self.game.construction, True)
+        pg.sprite.spritecollide(self, self.game.g.construction, True)
 
     def build_tick(self):
         self.image.set_alpha((self.tick * 75) + 25)
@@ -61,6 +61,6 @@ class Construction(Sprite):
         """I am speed building cities"""
         if self.tick > CONSTRUCT_TIME:
             CityBuilding(self.game, self.rect.x, self.rect.y, self.surf1)
-            self.game.stats.refresh_income()
+            self.game.resource.refresh()
             self.game.check_button_validity()
             self.delete()

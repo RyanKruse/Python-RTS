@@ -6,7 +6,7 @@ from sprites import *
 class EnemyUnit(Sprite):
     """This class handles enemy units."""
     def __init__(self, game):
-        self.groups = game.all_sprites, game.collision_sprites, game.enemy_units
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.enemy_units
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         # Image information
@@ -34,12 +34,12 @@ class EnemyUnit(Sprite):
 
     def collision_detection(self):
         """If collision with another sprite occurs, this bumps us away."""
-        for other in pg.sprite.spritecollide(self, self.game.collision_sprites, False):
+        for other in pg.sprite.spritecollide(self, self.game.g.collision_sprites, False):
             self.game.collision_bump(self, other)
 
     def delete(self):
         """Deletes self."""
-        pg.sprite.spritecollide(self, self.game.enemy_units, True)
+        pg.sprite.spritecollide(self, self.game.g.enemy_units, True)
 
 
 # =============================================== Child Classes ================================================== #

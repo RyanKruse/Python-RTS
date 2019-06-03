@@ -9,7 +9,7 @@ import random
 
 class Building(Sprite):
     def __init__(self, game):
-        self.groups = game.all_sprites, game.collision_sprites, game.buildings
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.buildings
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.cost = []
@@ -28,7 +28,7 @@ class Building(Sprite):
         self.image = pg.image.load(image)
         self.size = self.image.get_rect().size
         self.rect = self.image.get_rect()
-        for ghost in self.game.ghost_building:
+        for ghost in self.game.g.ghost_building:
             self.rect.centerx = ghost.rect.centerx
             self.rect.centery = ghost.rect.centery
         self.cost = [food_cost, iron_cost, gold_cost]
@@ -37,7 +37,7 @@ class Building(Sprite):
 
     def delete(self):
         """Deletes self."""
-        pg.sprite.spritecollide(self.game.mouse, self.game.buildings, True)
+        pg.sprite.spritecollide(self.game.mouse, self.game.g.buildings, True)
 
     def child_update(self):
         """Specific updates for child classes."""
@@ -58,7 +58,7 @@ class CityBuilding(Building):
     def __init__(self, game, x, y, surf1):
         super().__init__(game)
         self.child_inits(CITY_VALID, CITY_F, CITY_I, CITY_G, CITY_F_R, CITY_I_R, CITY_G_R)
-        pg.sprite.Group.add(self.game.cities, self)
+        pg.sprite.Group.add(self.game.g.cities, self)
         self.radius = CITY_START_RADIUS
         self.surf1 = surf1
         self.rect.x = x
@@ -84,7 +84,7 @@ class WallBuilding(Building):
     def __init__(self, game):
         super().__init__(game)
         self.child_inits(WALL_VALID, WALL_F, WALL_I, WALL_G, WALL_F_R, WALL_I_R, WALL_G_R)
-        pg.sprite.Group.add(self.game.walls, self)
+        pg.sprite.Group.add(self.game.g.walls, self)
         self.radius = 400
         self.collided_circle = None
 
@@ -106,8 +106,8 @@ class TowerBuilding(Building):
     def __init__(self, game):
         super().__init__(game)
         self.child_inits(TOWER_VALID, TOWER_F, TOWER_I, TOWER_G, TOWER_F_R, TOWER_I_R, TOWER_G_R)
-        pg.sprite.Group.add(self.game.towers, self)
-        pg.sprite.Group.remove(self.game.collision_sprites, self)
+        pg.sprite.Group.add(self.game.g.towers, self)
+        pg.sprite.Group.remove(self.game.g.collision_sprites, self)
         self.colorkey = self.image.get_at((0, 0))
         self.image.set_colorkey(self.colorkey)
         self.radius = TOWER_RADIUS
@@ -127,21 +127,21 @@ class TowerBuilding(Building):
     def shoot_enemies(self):
         """This shoots bullets at enemy groups."""
         self.enemies_in_range = None
-        self.enemies_in_range = pg.sprite.spritecollide(self, self.game.enemy_units, False, collided=self.game.circol)
+        self.enemies_in_range = pg.sprite.spritecollide(self, self.game.g.enemy_units, False, collided=self.game.circol)
         if self.enemies_in_range:
             for enemy in self.enemies_in_range:
                 """We only want to shoot the first enemy"""
                 if random.randint(1, TOWER_SHOOT_LIKELIHOOD) == 1:
                     TowerArrow(self.game, self.rect.centerx, self.rect.centery, enemy.rect.centerx, enemy.rect.centery,
-                               self.game.enemy_units)
+                               self.game.g.enemy_units)
                 break
 
 
 class PlateBuilding(Building):
     def __init__(self, game, image, rect, size):
         super().__init__(game)
-        pg.sprite.Group.add(self.game.plates, self)
-        pg.sprite.Group.remove(self.game.all_sprites, self)
+        pg.sprite.Group.add(self.game.g.plates, self)
+        pg.sprite.Group.remove(self.game.g.all_sprites, self)
         self.child_inits(image, WALL_F, WALL_I, WALL_G, WALL_F_R, WALL_I_R, WALL_G_R)
         self.rect = rect
         self.size = size

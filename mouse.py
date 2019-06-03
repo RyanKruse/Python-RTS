@@ -6,7 +6,7 @@ from unit import Unit
 class Mouse(pg.sprite.Sprite):
     """The mouse class handles the selection box."""
     def __init__(self, game):
-        self.groups = game.all_sprites, game.mouse_group
+        self.groups = game.g.all_sprites, game.g.mouse_group
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
 
@@ -50,13 +50,13 @@ class Mouse(pg.sprite.Sprite):
         if not self.game.is_ghost_building:
             self.is_selecting = False
             self.rect = pg.Rect(self.rect.x, self.rect.y, self.image.get_rect().size[0], self.image.get_rect().size[1])
-            collided = pg.sprite.spritecollide(self, self.game.units, False)
+            collided = pg.sprite.spritecollide(self, self.game.g.units, False)
             self.image = pg.Surface(NO_SURFACE)
             self.rect = pg.Rect(PIXEL_RECT)
 
             # Lets units know they are selected. We don't want to select more than the max allowance.
             for unit in collided:
-                if len(self.game.selected_units) >= MAX_UNIT_SELECTION:
+                if len(self.game.g.selected_units) >= MAX_UNIT_SELECTION:
                     break
                 if isinstance(unit, Unit):
                     unit.set_selected()

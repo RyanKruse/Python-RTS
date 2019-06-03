@@ -7,7 +7,7 @@ from sprites import *
 class Unit(Sprite):
     """This class handles knights."""
     def __init__(self, game):
-        self.groups = game.all_sprites, game.collision_sprites, game.units
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.units
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         # Image information
@@ -51,24 +51,24 @@ class Unit(Sprite):
 
     def collision_detection(self):
         """If collision with another sprite occurs, this bumps us away."""
-        for other in pg.sprite.spritecollide(self, self.game.collision_sprites, False):
+        for other in pg.sprite.spritecollide(self, self.game.g.collision_sprites, False):
             self.game.collision_bump(self, other)
 
     def set_selected(self):
         """Adds unit into the selected units group."""
-        pg.sprite.Group.add(self.game.selected_units, self)
+        pg.sprite.Group.add(self.game.g.selected_units, self)
         self.is_selected = True
         self.image = self.image_selected
 
     def set_deselected(self):
         """Removes unit from the selected units group."""
-        pg.sprite.Group.remove(self.game.selected_units, self)
+        pg.sprite.Group.remove(self.game.g.selected_units, self)
         self.is_selected = False
         self.image = self.image_deselected
 
     def delete(self):
         """Deletes self."""
-        pg.sprite.spritecollide(self, self.game.units, True)
+        pg.sprite.spritecollide(self, self.game.g.units, True)
 
 
 # =============================================== Child Classes ================================================== #

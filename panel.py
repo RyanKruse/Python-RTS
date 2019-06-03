@@ -5,9 +5,9 @@ from settings import *
 
 class Panel:
     def __init__(self, game):
-        """Initialize the game stats panel on top left."""
+        """Initialize the game s panel on top left."""
         self.game = game
-        self.game.panels.append(self)
+        self.game.g.panels.append(self)
 
         # Size, color, and font information.
         self.width = PANEL_WIDTH
@@ -50,7 +50,7 @@ class FoodPanel(Panel):
         self.refresh_panel()
 
     def refresh_panel(self):
-        self.build_panel('Food: ' + str(round(self.game.stats.food_stored)) + ' (+' + str(self.game.stats.food_income) + ')')
+        self.build_panel('Food: ' + str(round(self.game.resource.food)) + ' (+' + str(self.game.resource.food_income) + ')')
 
 
 class IronPanel(Panel):
@@ -60,7 +60,7 @@ class IronPanel(Panel):
         self.refresh_panel()
 
     def refresh_panel(self):
-        self.build_panel('Iron: ' + str(round(self.game.stats.iron_stored)) + ' (+' + str(self.game.stats.iron_income) + ')')
+        self.build_panel('Iron: ' + str(round(self.game.resource.iron)) + ' (+' + str(self.game.resource.iron_income) + ')')
 
 
 class GoldPanel(Panel):
@@ -70,7 +70,7 @@ class GoldPanel(Panel):
         self.refresh_panel()
 
     def refresh_panel(self):
-        self.build_panel('Gold: ' + str(round(self.game.stats.gold_stored)) + ' / ' + str(WINNING_CONDITION))
+        self.build_panel('Gold: ' + str(round(self.game.resource.gold)) + ' / ' + str(WINNING_CONDITION))
 
 
 class CityPanel(Panel):
@@ -80,7 +80,7 @@ class CityPanel(Panel):
         self.refresh_panel()
 
     def refresh_panel(self):
-        self.build_panel('Cities: ' + str(len(self.game.cities)))
+        self.build_panel('Cities: ' + str(len(self.game.g.cities)))
 
 
 class UnitPanel(Panel):
@@ -90,5 +90,5 @@ class UnitPanel(Panel):
         self.refresh_panel()
 
     def refresh_panel(self):
-        self.build_panel('Supply: ' + str(len(self.game.units)) + ' / ' + str(MAX_UNIT_CAP))
+        self.build_panel('Supply: ' + str(len(self.game.g.units)) + ' / ' + str(MAX_UNIT_CAP))
 

@@ -49,8 +49,8 @@ class Runner(Sprite):
 
     def collision_detection(self):
         """We spawn a ghost plate any time the runner is not colliding with a ghost plate or ghost wall."""
-        self.collided_circle = pg.sprite.spritecollide(self, self.game.current_run, False, collided=self.game.circol)\
-            + pg.sprite.spritecollide(self, self.game.ghost_building, False)
+        self.collided_circle = pg.sprite.spritecollide(self, self.game.g.current_run, False, collided=self.game.circol)\
+            + pg.sprite.spritecollide(self, self.game.g.ghost_building, False)
         if not self.collided_circle:
             PlateGhost(self.game, self)
 
@@ -63,5 +63,5 @@ class Runner(Sprite):
         self.move_y = move_y
         self.rect.centerx = start_x
         self.rect.centery = start_y
-        self.game.current_run.empty()
+        self.game.g.current_run.empty()
         self.move_counter = 0

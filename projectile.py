@@ -7,7 +7,7 @@ from sprites import *
 class TowerArrow(Sprite):
     """This is an arrow projectile, spawned by tower. It can be used for friendly/foe."""
     def __init__(self, game, start_x, start_y, move_x, move_y, enemy_group):
-        self.groups = game.all_sprites, game.projectiles
+        self.groups = game.g.all_sprites, game.g.projectiles
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         # Image Information
@@ -46,7 +46,7 @@ class TowerArrow(Sprite):
         collision = pg.sprite.spritecollide(self, self.enemy_group, False)
         for obj in collision:
             obj.health -= TOWER_ARROW_DAMAGE/len(collision)
-            pg.sprite.spritecollide(self, self.game.projectiles, True)
+            pg.sprite.spritecollide(self, self.game.g.projectiles, True)
             if obj.health <= 0:
                 obj.delete()
             break
@@ -55,6 +55,6 @@ class TowerArrow(Sprite):
         """If projectile misses its target, it flies extra until it decays."""
         self.overlap -= 1
         if self.overlap == 0:
-            pg.sprite.spritecollide(self, self.game.projectiles, True)
+            pg.sprite.spritecollide(self, self.game.g.projectiles, True)
         self.move_x = self.rect.x + (self.move_x - self.start_x)
         self.move_y = self.rect.y + (self.move_y - self.start_y)

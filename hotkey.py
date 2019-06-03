@@ -28,7 +28,7 @@ class HotKey:
     def add_unit_hotkey(self, num):
         """Adds the units into the hotkey group."""
         self.get(num).empty()
-        for unit in self.game.selected_units:
+        for unit in self.game.g.selected_units:
             if len(self.get(num)) < MAX_HOTKEY_SELECTION:
                 pg.sprite.Group.add(self.get(num), unit)
         print(str(self.get(num)))
