@@ -62,5 +62,4 @@ class Construction(Sprite):
         if self.tick > CONSTRUCT_TIME:
             CityBuilding(self.game, self.rect.x, self.rect.y, self.surf1)
             self.game.resource.refresh()
-            self.game.check_button_validity()
             self.delete()

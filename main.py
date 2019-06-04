@@ -187,7 +187,8 @@ class Main:
         for ghost in self.g.ghost_building:
             ghost.delete()
         for button in self.g.all_buttons:
-            button.deselect()
+            button.image = button.image_deselected
+            button.selected = False
         self.is_ghost_building = False
         self.delete_ghost_plates()
 
@@ -210,7 +211,7 @@ class Main:
             gate = True
             # Allows construction only if not clicking on button or panel.
             for button in self.g.all_buttons:
-                if button.get_clicked():
+                if button.clicked():
                     gate = False
             for panel in self.g.panels:
                 if panel.get_clicked():
@@ -221,20 +222,14 @@ class Main:
 
     def construct_ghost(self):
         """Creates building ghost when button is clicked."""
-        if self.is_ctrl_pressed:
-            for button in self.g.all_buttons:
-                button.is_clicked()
+        for button in self.g.all_buttons:
+            button.click()
 
     def command_units(self):
         """Defines move_x and move_y for selected units."""
         self.mouse.is_commanding = True
         for unit in self.g.selected_units:
             unit.set_move_location()
-
-    def check_button_validity(self):
-        """Makes sure certain buttons appear if a city exist."""
-        for button in self.g.all_buttons:
-            button.get_restricted()
 
     def refund_building(self):
         """Refund building mouse hovering over."""
@@ -244,7 +239,6 @@ class Main:
             mouse_collided[0].delete()
             self.resource.deduct(refund_amount)
             mouse_collided[0].delete()
-        self.check_button_validity()
         self.resource.refresh()
 
     def delete_ghost_plates(self):
@@ -374,7 +368,7 @@ class Main:
             panel.draw_panel()
         if self.is_ctrl_pressed:
             for button in self.g.all_buttons:
-                if not button.is_restricted:
+                if not button.restricted or self.alive():
                     self.screen.blit(button.image, button.rect)
 
     def draw_circles(self):

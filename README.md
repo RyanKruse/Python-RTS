@@ -3,27 +3,27 @@ In this project, I write code in python to build an RTS game. This is a personal
 
 Below are some screen shots. Requires Python 3.6 and the Pygame modules to run.
 
-## Siege Snapshot
+## Snapshot 1
 
 <p align="center">
 	<img src="readme_files/Python_RTS_Siege.png"></img>
 </p>
 
-## Prison Snapshot
+## Snapshot 2
 
 <p align="center">
 	<img src="readme_files/Python_RTS_Prison.png"></img>
 </p>
 
 
-## Territory Snapshot
+## Snapshot 3
 
 <p align="center">
 	<img src="readme_files/Python_RTS_Territory.png"></img>
 </p>
 
 
-## Walls Snapshot
+## Snapshot 4
 
 <p align="center">
 	<img src="readme_files/Python_RTS_Walls.png"></img>
