@@ -9,10 +9,8 @@ from settings import *
 from sprites import Player, Wall
 
 # My Imports
-from mouse import Mouse
 from unit import *
 from ghost import *
-from panel import *
 from enemy import *
 from hotkey import HotKey
 from construction import *
@@ -35,17 +33,18 @@ class Main:
         self.map = window.Map()
         self.camera = window.Camera(self)
         self.clock = window.Clock()
+        self.mouse = window.Mouse(self)
         self.city_button = window.CityButton(self)
         self.wall_button = window.WallButton(self)
         self.tower_button = window.TowerButton(self)
         self.knight_button = window.KnightButton(self)
+        self.food_panel = window.FoodPanel(self)
+        self.iron_panel = window.IronPanel(self)
+        self.gold_panel = window.GoldPanel(self)
+        self.city_panel = window.CityPanel(self)
+        self.unit_panel = window.UnitPanel(self)
 
         # Initialize menu buttons & logic
-        self.food_panel = FoodPanel(self)
-        self.iron_panel = IronPanel(self)
-        self.gold_panel = GoldPanel(self)
-        self.city_panel = CityPanel(self)
-        self.unit_panel = UnitPanel(self)
         self.is_ctrl_pressed = False
         self.is_shift_pressed = False
         self.is_alt_pressed = False
@@ -56,7 +55,6 @@ class Main:
         self.random_number = 0
 
         # Initialize other code
-        self.mouse = Mouse(self)
         self.hotkey = HotKey(self)
         self.runner = Runner(self)
 
@@ -211,10 +209,10 @@ class Main:
             gate = True
             # Allows construction only if not clicking on button or panel.
             for button in self.g.all_buttons:
-                if button.clicked():
+                if button.is_clicked():
                     gate = False
             for panel in self.g.panels:
-                if panel.get_clicked():
+                if panel.is_clicked():
                     gate = False
             if gate:
                 for ghost in self.g.ghost_building:

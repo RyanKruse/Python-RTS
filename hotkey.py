@@ -37,4 +37,4 @@ class HotKey:
         """Selects the units in the hotkey group."""
         self.game.deselect_units()
         for unit in self.get(num):
-            unit.select()
+            unit.select_button()
