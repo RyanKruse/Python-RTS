@@ -1,4 +1,3 @@
-# Scroll-map Imports
 import sys
 import pygame as pg
 import window
@@ -6,21 +5,11 @@ import game
 from os import path
 from pygame.sprite import Group
 from settings import *
-from sprites import Player, Wall
-
-# My Imports
 from unit import *
-from ghost import *
-from enemy import *
-from hotkey import HotKey
-from construction import *
-from runner import Runner
 from pygame.math import Vector2
 
-# Due to frequency of use, Main = m, Group = g, Pygame = pg.
 
-
-class Main:
+class Main:  # TODO: Github code cleanup.
     def __init__(self):
         # Initialize game.
         pg.init()
@@ -55,8 +44,8 @@ class Main:
         self.random_number = 0
 
         # Initialize other code
-        self.hotkey = HotKey(self)
-        self.runner = Runner(self)
+        self.hotkey = game.HotKey(self)
+        self.runner = game.Runner(self)
 
     def alive(self):
         return len(self.g.cities) > 0
@@ -66,11 +55,11 @@ class Main:
         for row, tiles in enumerate(self.map.contents):
             for col, tile in enumerate(tiles):
                 if tile == '1':
-                    Wall(self, col, row)
+                    window.Wall(self, col, row)
                 if tile == 'P':
-                    self.player = Player(self, col, row)
+                    self.player = window.Player(self, col, row)
                 if tile == 'i':
-                    Iron(self, col, row)
+                    window.Iron(self, col, row)
 
     def run(self):
         while True:
@@ -118,7 +107,7 @@ class Main:
             self.hide_ghost(True)
         # ALT
         elif event.key == pg.K_LALT:
-            pass  # Currently crashes game.
+            pass  # TODO: This code currently crashes game.
             # self.is_alt_pressed = True
             # self.random_number = random.randint(1, self.pass_length)
         # Quit

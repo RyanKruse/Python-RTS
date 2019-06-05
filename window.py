@@ -1,8 +1,11 @@
 import pygame as pg
 from settings import *
-from ghost import *
 from os import path
 from unit import Unit
+import pygame.gfxdraw
+import pygame.font
+from pygame.color import THECOLORS
+from building import *
 import pygame.font
 
 
@@ -54,13 +57,12 @@ class Clock:
         self.resource_time = 0
 
 
-class Mouse(pg.sprite.Sprite):
+class Mouse(pg.sprite.Sprite):  # TODO: Github code cleanup.
     """The mouse class handles the selection box."""
     def __init__(self, game):
         self.groups = game.g.all_sprites, game.g.mouse_group
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-
         # Selection box information.
         self.is_selecting = False
         self.quadrant = 0
@@ -68,14 +70,12 @@ class Mouse(pg.sprite.Sprite):
         self.lock_y = 0
         self.moved_x = 0
         self.moved_y = 0
-
         # Image information.
         self.image = pg.Surface(NO_SURFACE)
         self.size = self.image.get_rect().size
         self.rect = pg.Rect(PIXEL_RECT)
         self.alpha_surface = None
         self.radius = CITY_MAX_RADIUS
-
         # Unit commander.
         self.is_commanding = False
 
@@ -125,7 +125,6 @@ class Mouse(pg.sprite.Sprite):
             self.define_box(2, self.moved_x, self.moved_y, self.lock_x, self.lock_y)
         elif (0 > self.moved_x - self.lock_x) and (0 < self.moved_y - self.lock_y):
             self.define_box(3, self.moved_x, self.lock_y, self.lock_x, self.moved_y)
-
         # Makes box transparent.
         self.image.set_alpha(BOX_TRANSPARENCY)
 
@@ -141,6 +140,66 @@ class Mouse(pg.sprite.Sprite):
         """This tracks cursor position at all times not selecting units. Used for refunding building/units."""
         self.rect.x = pg.mouse.get_pos()[0] - self.game.camera.x
         self.rect.y = pg.mouse.get_pos()[1] - self.game.camera.y
+
+
+class Player(pg.sprite.Sprite):  # TODO: Github code cleanup.
+    def __init__(self, game, x, y):
+        self.groups = game.g.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pygame.Surface((0, 0))
+        # self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+
+    def get_keys(self):
+        """This code is fired from get_keys, independent from game class keys."""
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and not keys[pygame.K_d]:
+            self.x -= self.game.camera.speed
+        elif keys[pygame.K_d] and not keys[pygame.K_a]:
+            self.x += self.game.camera.speed
+        if keys[pygame.K_w] and not keys[pygame.K_s]:
+            self.y -= self.game.camera.speed
+        elif keys[pygame.K_s] and not keys[pygame.K_w]:
+            self.y += self.game.camera.speed
+
+    def update(self):
+        self.get_keys()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+
+class Wall(pg.sprite.Sprite):  # TODO: Github code cleanup.
+    """I don't know what those game.x functions are."""
+    def __init__(self, game, x, y):
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.map_walls
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pygame.Surface((TILESIZE, TILESIZE))
+        self.image.fill(THECOLORS['cornflowerblue'])
+        self.size = self.image.get_rect().size
+        self.rect = self.image.get_rect()
+        self.x = x  # Unknown
+        self.y = y  # Unknown
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+
+
+class Iron(pg.sprite.Sprite):  # TODO: Github code cleanup.
+    def __init__(self, game, x, y):
+        self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.map_iron
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pygame.Surface((TILESIZE/2, TILESIZE/2), pg.SRCALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x = (x * TILESIZE + (TILESIZE / 4))
+        self.rect.y = (y * TILESIZE + (TILESIZE / 4))
+
+    def draw(self):
+        pygame.gfxdraw.filled_circle(self.image, round(TILESIZE / 4), round(TILESIZE / 4),
+                                     round(TILESIZE / 5), THECOLORS['gray'])
 
 
 # =================================================== Button Class ================================================== #
