@@ -13,7 +13,7 @@ import random
 
 
 # =============================================== Ghost Class ================================================== #
-class Ghost(Sprite):  # TODO: Github code cleanup.
+class Ghost(Sprite):
     def __init__(self, game):
         # Group information
         # self.groups = game.all_sprites, game.ghosts
@@ -90,7 +90,7 @@ class Ghost(Sprite):  # TODO: Github code cleanup.
         pass
 
 
-class CityGhost(Ghost):  # TODO: Github code cleanup.
+class CityGhost(Ghost):
     def __init__(self, game):
         super().__init__(game)
         self.child_init(CITY_VALID, CITY_INVALID)
@@ -107,7 +107,7 @@ class CityGhost(Ghost):  # TODO: Github code cleanup.
         self.collision_detection(pg.sprite.spritecollide(self, self.game.g.collision_sprites, False), 1)
 
 
-class WallGhost(Ghost):  # TODO: Github code cleanup.
+class WallGhost(Ghost):
     """Finally, it's done. Not yet, it's going to get ugly."""
     def __init__(self, game):
         super().__init__(game)
@@ -184,7 +184,7 @@ class WallGhost(Ghost):  # TODO: Github code cleanup.
             self.game.runner.run(self.rect.centerx, self.rect.centery, wall.rect.centerx, wall.rect.centery)
 
 
-class PlateGhost(Ghost):  # TODO: Github code cleanup.
+class PlateGhost(Ghost):
     def __init__(self, game, runner):
         super().__init__(game)
         self.runner = runner
@@ -231,7 +231,7 @@ class PlateGhost(Ghost):  # TODO: Github code cleanup.
         PlateBuilding(self.game, self.image, self.rect, self.size)
 
 
-class TowerGhost(Ghost):  # TODO: Github code cleanup.
+class TowerGhost(Ghost):
     def __init__(self, game):
         super().__init__(game)
         self.child_init(TOWER_VALID, TOWER_INVALID)
@@ -257,7 +257,7 @@ class TowerGhost(Ghost):  # TODO: Github code cleanup.
         self.image.set_colorkey(self.colorkey)
 
 
-class KnightGhost(Ghost):  # TODO: Github code cleanup.
+class KnightGhost(Ghost):
     def __init__(self, game):
         super().__init__(game)
         self.child_init(KNIGHT_VALID, KNIGHT_INVALID)
@@ -276,7 +276,7 @@ class KnightGhost(Ghost):  # TODO: Github code cleanup.
 
 
 # ============================================= Construction Class ================================================ #
-class Construction(Sprite):  # TODO: Github code cleanup.
+class Construction(Sprite):
     """Construction delay for building cities or workshops."""
     def __init__(self, game, x, y):
         # Group information
@@ -335,7 +335,7 @@ class Construction(Sprite):  # TODO: Github code cleanup.
 
 
 # =============================================== Building Class ================================================== #
-class Building(Sprite):  # TODO: Github code cleanup.
+class Building(Sprite):
     def __init__(self, game):
         self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.buildings
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -380,7 +380,7 @@ class Building(Sprite):  # TODO: Github code cleanup.
         pass
 
 
-class CityBuilding(Building):  # TODO: Github code cleanup.
+class CityBuilding(Building):
     def __init__(self, game, x, y, surf1):
         super().__init__(game)
         self.child_inits(CITY_VALID, CITY_F, CITY_I, CITY_G, CITY_F_R, CITY_I_R, CITY_G_R)
@@ -406,7 +406,7 @@ class CityBuilding(Building):  # TODO: Github code cleanup.
                          (self.rect.center[1] + self.game.camera.y) - CITY_MAX_RADIUS, 0, 0))
 
 
-class WallBuilding(Building):  # TODO: Github code cleanup.
+class WallBuilding(Building):
     """Major experimenting. Do walls today."""
     def __init__(self, game):
         super().__init__(game)
@@ -430,7 +430,7 @@ class WallBuilding(Building):  # TODO: Github code cleanup.
                 collided.radius, 1)
 
 
-class TowerBuilding(Building):  # TODO: Github code cleanup.
+class TowerBuilding(Building):
     def __init__(self, game):
         super().__init__(game)
         self.child_inits(TOWER_VALID, TOWER_F, TOWER_I, TOWER_G, TOWER_F_R, TOWER_I_R, TOWER_G_R)
@@ -465,7 +465,7 @@ class TowerBuilding(Building):  # TODO: Github code cleanup.
                 break
 
 
-class PlateBuilding(Building):  # TODO: Github code cleanup.
+class PlateBuilding(Building):
     def __init__(self, game, image, rect, size):
         super().__init__(game)
         pg.sprite.Group.add(self.game.g.plates, self)
@@ -482,7 +482,7 @@ class PlateBuilding(Building):  # TODO: Github code cleanup.
         self.refund_amount = [food_refund, iron_refund, gold_refund]
 
 
-class TowerArrow(Sprite):  # TODO: Github code cleanup.
+class TowerArrow(Sprite):
     """This is an arrow projectile, spawned by tower. It can be used for friendly/foe."""
     def __init__(self, game, start_x, start_y, move_x, move_y, enemy_group):
         self.groups = game.g.all_sprites, game.g.projectiles

@@ -4,7 +4,7 @@ from settings import *
 
 
 # =============================================== Owner Classes ================================================== #
-class Unit(Sprite):  # TODO: Github code cleanup.
+class Unit(Sprite):
     """This class handles knights."""
     def __init__(self, game):
         self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.units
@@ -71,7 +71,7 @@ class Unit(Sprite):  # TODO: Github code cleanup.
         pg.sprite.spritecollide(self, self.game.g.units, True)
 
 
-class Knight(Unit):  # TODO: Github code cleanup.
+class Knight(Unit):
     def __init__(self, game):
         super().__init__(game)
         # Image information.
@@ -82,7 +82,7 @@ class Knight(Unit):  # TODO: Github code cleanup.
 
 
 # =============================================== Enemy Classes ================================================== #
-class EnemyUnit(Sprite):  # TODO: Github code cleanup.
+class EnemyUnit(Sprite):
     """This class handles enemy units."""
     def __init__(self, game):
         self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.enemy_units
@@ -121,7 +121,7 @@ class EnemyUnit(Sprite):  # TODO: Github code cleanup.
         pg.sprite.spritecollide(self, self.game.g.enemy_units, True)
 
 
-class EnemyKnight(EnemyUnit):  # TODO: Github code cleanup.
+class EnemyKnight(EnemyUnit):
     def __init__(self, game):
         super().__init__(game)
         # Image information.

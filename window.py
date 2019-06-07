@@ -57,7 +57,7 @@ class Clock:
         self.resource_time = 0
 
 
-class Mouse(pg.sprite.Sprite):  # TODO: Github code cleanup.
+class Mouse(pg.sprite.Sprite):
     """The mouse class handles the selection box."""
     def __init__(self, game):
         self.groups = game.g.all_sprites, game.g.mouse_group
@@ -142,7 +142,7 @@ class Mouse(pg.sprite.Sprite):  # TODO: Github code cleanup.
         self.rect.y = pg.mouse.get_pos()[1] - self.game.camera.y
 
 
-class Player(pg.sprite.Sprite):  # TODO: Github code cleanup.
+class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.g.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -171,7 +171,7 @@ class Player(pg.sprite.Sprite):  # TODO: Github code cleanup.
         self.rect.y = self.y
 
 
-class Wall(pg.sprite.Sprite):  # TODO: Github code cleanup.
+class Wall(pg.sprite.Sprite):
     """I don't know what those game.x functions are."""
     def __init__(self, game, x, y):
         self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.map_walls
@@ -187,7 +187,7 @@ class Wall(pg.sprite.Sprite):  # TODO: Github code cleanup.
         self.rect.y = y * TILESIZE
 
 
-class Iron(pg.sprite.Sprite):  # TODO: Github code cleanup.
+class Iron(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.g.all_sprites, game.g.collision_sprites, game.g.map_iron
         pygame.sprite.Sprite.__init__(self, self.groups)

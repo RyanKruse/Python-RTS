@@ -9,7 +9,7 @@ from unit import *
 from pygame.math import Vector2
 
 
-class Main:  # TODO: Github code cleanup.
+class Main:
     def __init__(self):
         # Initialize game.
         pg.init()

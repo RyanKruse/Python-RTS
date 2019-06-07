@@ -137,7 +137,7 @@ class HotKey:  # TODO: Github code cleanup.
             unit.select_button()  # TODO: Debug button knight class missing.
 
 
-class Runner(Sprite):  # TODO: Github code cleanup.
+class Runner(Sprite):
     """This class runs from point A to point B and tried to spawn a building every frame of the way."""
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
