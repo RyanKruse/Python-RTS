@@ -1,9 +1,8 @@
 # Python RTS
-In this project, I write code in python to build an RTS game. This is a personal project that I had a lot of fun programming in.
-It sharpened me as a programmer and improved my abilities in OOP programming, data structure assembly, and algorithm optimization.
+In this project, I write code in python to build an RTS game. This is a personal project that improved my abilities in OOP programming, data structure assembly, and algorithm optimization.
 
 Inspired by Google Deepmind's victory over professional Starcraft II players, the main goal of this program is to eventually test different artificial intelligence algorithms.
-If an AI can train itself in this model, then I think that would be really cool to understand which algorithms work best and why.
+If an AI can train itself in this model, then I think that would be cool to understand which algorithms work best and why.
 
 This program was developed in the PyCharm IDE. To run this program simply pull it from github and ensure that Python 3.6
 is set as the project interpreter. After that, use pip to install the Pygame modules and run the program from main.py.
@@ -12,7 +11,7 @@ is set as the project interpreter. After that, use pip to install the Pygame mod
 	<img src="images/Settings_Project.JPG"></img>
 </p>
 
-Below are some snaps shots of Python RTS.
+Below are some in-game snaps shots utilizing different building and commanding features.
 
 ## Snapshot 1
 
